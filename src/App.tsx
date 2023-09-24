@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import axios from "axios";
+import useDebouncedEffect from "use-debounced-effect";
 import { sortBy } from "lodash";
 
 import AmountInput from "./components/AmountInput";
@@ -9,13 +10,19 @@ import ResultRow from "./components/ResultRow";
 type CachedResult = {
   provider: string;
   btc: string;
+};
+
+type OfferResults = {
+  [key: string]:string
 }
 
-
+const defaultAmount = "100";
 
 const App = () => {
-  const [amount, setAmount] = useState("100");
+  const [prevAmount, setPrevAmount] = useState(defaultAmount);
+  const [amount, setAmount] = useState(defaultAmount);
   const [cachedResults, setCachedResults] = useState<CachedResult>([]);
+  const [offerResults, setOfferResults] = useState<OfferResults>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,7 +32,33 @@ const App = () => {
     });
   }, []);
 
-  const sortedCache = sortBy(cachedResults, 'btc').reverse()
+  useDebouncedEffect(
+    () => { 
+      if(amount === defaultAmount){
+        return
+      }
+      if (amount !== prevAmount) {
+        setLoading(true);
+        axios
+          .get(`https://sijwi3sm2b.us.aircode.run/offers?amount=${amount}`)
+          .then((res) => {
+            setLoading(false);
+            setOfferResults(res.data);
+            setPrevAmount(amount);
+          });
+      }
+    },
+    300,
+    [amount]
+  );
+
+  const sortedCache = sortBy(cachedResults, "btc").reverse();
+
+  const sortedResults:CachedResult = sortBy(Object.keys(offerResults).map(provider => ({
+    provider, btc:offerResults[provider]
+  })), "btc").reverse();
+
+  const showCached = amount === defaultAmount;
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-8">
@@ -47,11 +80,22 @@ const App = () => {
             <ResultRow loading={true} />
           </>
         )}
-        {!loading && sortedCache.map((result:CachedResult, index:number) => (
-          <ResultRow key={index} providerName={result.provider}
-          btc={result.btc}
-          />
-        ))}
+        {!loading &&
+          showCached &&
+          sortedCache.map((result: CachedResult) => (
+            <ResultRow
+              key={result.provider}
+              providerName={result.provider}
+              btc={result.btc}
+            />
+          ))}
+          {!loading && !showCached && sortedResults.map(result => (
+             <ResultRow
+             key={result.provider}
+             providerName={result.provider}
+             btc={result.btc}
+           />
+          ))}
       </div>
     </main>
   );

@@ -1,7 +1,20 @@
+import paybisLogo from "../assets/paybis.png";
+
 type ResultRowProps = {
   loading?: boolean;
   providerName?: string;
   btc?: string;
+};
+
+type Logo = { source: string; invert?: boolean };
+
+const logos: { [keys: string]: Logo } = {
+  paybis: { source: paybisLogo },
+  guardarian: { source: "https://guardarian.com/main-logo-dark.svg" },
+  moonpay: { source: "https://www.moonpay.com/assets/logo-full-white.svg" },
+  transak: {
+    source: "https://assets.transak.com/images/website/transak-logo.svg",
+  },
 };
 
 export default function ResultRow({
@@ -10,14 +23,26 @@ export default function ResultRow({
   btc,
 }: ResultRowProps) {
   return (
-    <div className="relative border min-h-[64px] border-white/10 rounded-lg bg-gradient-to-r from-purple-500/10 to-blue-500/10 p-4 my-2 overflow-hidden">
+    <div className="relative border  min-h-[64px] border-white/10 rounded-lg bg-gradient-to-r from-purple-500/10 to-blue-500/10 p-6 my-4 overflow-hidden">
       <div className="flex gap-4">
-        {providerName && <div>logo</div>}
-        <div className="grow">{providerName || ""}</div>
+        {providerName && (
+          <div className="grow items-center flex">
+            <img
+              src={logos[providerName].source}
+              alt="paybis-logo"
+              className={
+                "h-10 " + (logos[providerName]?.invert ? "invert" : "")
+              }
+            />
+          </div>
+        )}
+
         {btc && (
           <div className="flex gap-2">
-            <span className="text-xl text-purple-200/80"> 
-            {new Intl.NumberFormat("en-US", {minimumFractionDigits: 8}).format(parseFloat(btc))}
+            <span className="text-xl text-purple-200/80">
+              {new Intl.NumberFormat("en-US", {
+                minimumFractionDigits: 8,
+              }).format(parseFloat(btc))}
             </span>
             <span className="text-xl text-purple-300/50">BTC</span>
           </div>

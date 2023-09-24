@@ -6,6 +6,7 @@ import { sortBy } from "lodash";
 
 import AmountInput from "./components/AmountInput";
 import ResultRow from "./components/ResultRow";
+import LoadingSkeleton from "./components/LoadingSkeleton";
 
 type CachedResult = {
   provider: string;
@@ -13,8 +14,8 @@ type CachedResult = {
 };
 
 type OfferResults = {
-  [key: string]:string
-}
+  [key: string]: string;
+};
 
 const defaultAmount = "100";
 
@@ -33,9 +34,8 @@ const App = () => {
   }, []);
 
   useDebouncedEffect(
-    () => { 
-      if(amount === defaultAmount){
-        return
+    () => {
+      if (amount === defaultAmount) {
       }
       if (amount !== prevAmount) {
         setLoading(true);
@@ -54,9 +54,13 @@ const App = () => {
 
   const sortedCache = sortBy(cachedResults, "btc").reverse();
 
-  const sortedResults:CachedResult = sortBy(Object.keys(offerResults).map(provider => ({
-    provider, btc:offerResults[provider]
-  })), "btc").reverse();
+  const sortedResults: CachedResult = sortBy(
+    Object.keys(offerResults).map((provider) => ({
+      provider,
+      btc: offerResults[provider],
+    })),
+    "btc"
+  ).reverse();
 
   const showCached = amount === defaultAmount;
 
@@ -73,12 +77,7 @@ const App = () => {
       </div>
       <div className="mt-6">
         {loading && (
-          <>
-            <ResultRow loading={true} />
-            <ResultRow loading={true} />
-            <ResultRow loading={true} />
-            <ResultRow loading={true} />
-          </>
+         <LoadingSkeleton />
         )}
         {!loading &&
           showCached &&
@@ -89,12 +88,14 @@ const App = () => {
               btc={result.btc}
             />
           ))}
-          {!loading && !showCached && sortedResults.map(result => (
-             <ResultRow
-             key={result.provider}
-             providerName={result.provider}
-             btc={result.btc}
-           />
+        {!loading &&
+          !showCached &&
+          sortedResults.map((result) => (
+            <ResultRow
+              key={result.provider}
+              providerName={result.provider}
+              btc={result.btc}
+            />
           ))}
       </div>
     </main>

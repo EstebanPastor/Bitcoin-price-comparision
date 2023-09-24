@@ -23,7 +23,10 @@ export default function ResultRow({
   btc,
 }: ResultRowProps) {
   return (
-    <div className="relative border  min-h-[64px] border-white/10 rounded-lg bg-gradient-to-r from-purple-500/10 to-blue-500/10 p-6 my-4 overflow-hidden">
+    <a 
+    href={`https://${providerName}.com`}
+    target="_blank"
+    className="block relative border min-h-[64px] border-white/10 rounded-lg bg-gradient-to-r from-purple-500/10 to-blue-500/10 p-6 my-4 overflow-hidden">
       <div className="flex gap-4">
         {providerName && (
           <div className="grow items-center flex">
@@ -49,8 +52,8 @@ export default function ResultRow({
         )}
       </div>
       {loading && (
-        <div className="inset-0 absolute bg-gradient-to-r from-transparent via-blue-800/50 to-transparent skeleton-animation"></div>
+        <div className="inset-0 absolute bg-gradient-to-r from-transparent via-blue-800/50 to-transparent skeleton-animation border-t border-white/25"></div>
       )}
-    </div>
+    </a>
   );
 }
